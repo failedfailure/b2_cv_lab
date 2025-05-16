@@ -137,20 +137,33 @@ allergens = {
     "Waffles": ["小麦", "卵", "乳", "大豆"]
 }
 
+def normalize_class_name(name):
+    name_with_spaces = name.replace('_', ' ')
+    return name_with_spaces[0].upper() + name_with_spaces[1:].lower()
+
 def predict_allergens(model, img_path, class_names, allergen_dict):
     img = tf.keras.preprocessing.image.load_img(img_path, target_size=(224, 224))
     img_array = tf.keras.preprocessing.image.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0)
+    img_array = tf.expand_dims(img_array, axis=0)
 
     predictions = model.predict(img_array)
     predicted_class = class_names[np.argmax(predictions[0])]
     confidence = np.max(predictions[0])
 
     predicted_class_lower = predicted_class.lower()
-    allergen_dict_lower = {k.lower(): v for k, v in allergen_dict.items()}
-    allergens = allergen_dict_lower.get(predicted_class_lower, [])
 
-    return predicted_class, confidence, allergens
+    matched_name = None
+    for food_name in allergen_dict:
+        if food_name.lower() == predicted_class_lower.replace("_", " "):
+            matched_name = food_name
+            break
+
+    if matched_name is None:
+        matched_name = predicted_class.replace("_", " ").capitalize()  # fallback
+    
+    allergens = allergen_dict.get(matched_name, [])
+
+    return matched_name, confidence, allergens
 
 def create_gui():
     def on_file_drop():
