@@ -1,7 +1,6 @@
-
 # CNNモデル構築コードの行ごとの解説
 
-## 📌 モデルの構築
+## モデルの構築
 
 ```python
 # Build a simple CNN model
@@ -25,7 +24,7 @@ model = models.Sequential([
 
 ---
 
-## 🔷 Block 1（32チャンネル）
+## Block 1（32チャンネル）
 
 ```python
     layers.Conv2D(32, (3, 3), padding='same', activation='relu',
